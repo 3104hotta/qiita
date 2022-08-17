@@ -10,7 +10,7 @@
 > ```
 > // Bad
 > bool read_password = true;
-> 
+>
 > // Good
 > bool need_password = true;
 > bool user_is_authenticated = true;
@@ -33,10 +33,10 @@
 >   public:
 >   // コンストラクタ
 >   Account();
->        
+>
 >   // profitに新しい値を設定する
 >   void SetProfit(double profit);
->       
+>
 >   // このAccountからprofitを返す
 >   double GetProfit();
 > };
@@ -54,18 +54,18 @@
 > // Bad
 > // 'src'の先頭や末尾にある'chars'を除去する
 > String Strip(String src, String chars) { ... }
-> 
+>
 > // Good
 > // 実例: Strip("abba/a/ba", "ab")は"/a/"を返す
-> String Strip(String src, String chars) { ... } 
-> ``` 
+> String Strip(String src, String chars) { ... }
+> ```
 
 > ```
 > // Bad
 > // 'v'の「要素 < pivot」が「要素 >= pivot」の前に来るように配置し直す。
 > // それから「v[i] < pivot」になる最大の'i'を返す(なければ-1を返す)。
 > int Partition(vector<int>* v, int pivot);
-> 
+>
 > // Good
 > // 実例: Partition([8,5,9,8,2], 8)の結果は[5,2|8,9,8]となり、1を返す。
 > int Partition(vector<int>* v, int pivot);
@@ -99,7 +99,7 @@ if(!debug)ではなく、if(debug)を使う。
 > } else {
 >   // 第2のケース
 > }
-> 
+>
 > // Good
 > if (a == b) {
 >   // 第2のケース
@@ -121,7 +121,7 @@ if(!debug)ではなく、if(debug)を使う。
 > public boolean Contains(String str, String substr) {
 >  if (str == null || substr == null) return false;
 >  if (substr.equals("")) return true;
-> 
+>
 >   ...
 > }
 > ```
@@ -140,7 +140,7 @@ if(!debug)ではなく、if(debug)を使う。
 >     reply.WriteErrors(user_result);
 > }
 > reply.Done();
-> 
+>
 > // Good
 > if (user_result != SUCCESS) {
 >   reply.WriteErrors(user_result);
@@ -198,7 +198,7 @@ if(!debug)ではなく、if(debug)を使う。
 > // Bad
 > now = datetime.datetime.now()
 > root_message.last_view_time = now
-> 
+>
 > // Good
 > root_message.last_view_time = datetime.datetime.now()
 > ```
@@ -207,9 +207,86 @@ if(!debug)ではなく、if(debug)を使う。
 > ```
 > // Bad
 > if (!(file_exists && !is_protected)) Error("Sorry, could not read file.");
-> 
+>
 > // Good
 > if (!file_exists || is_protected)) Error("Sorry, could not read file.");
 > ```
 
 ### 変数のスコープを縮める
+- グローバル変数はどこでどのように使われているのか追跡が難しい。
+- ローカル変数と衝突する恐れがある。
+```
+// Bad
+class LargeClass {
+  string str_;
+
+  void Method1() {
+    str_ = ...;
+    Method2();
+  };
+}
+
+  void Method2() {
+    // str_を使っている
+  };
+
+  // str_を使っていないメソッドがたくさんある
+}
+
+// Good
+class LargeClass {
+  void Method1() {
+    string str = ...;
+    Method2(str);
+  }
+
+  void Method2(string str) {
+    // strを使っている
+  }
+
+  // その他のメソッドはstrが見えない。
+}
+```
+JavaScriptの場合。ちなみにテキストではvarが使われていたが、基本varは使わない。（グローバルスコープになってしまうため）
+```
+// Bad
+submitted = false; // グローバル変数
+
+var submit_form = function () {
+  if (submitted) {
+    return; // 二重投稿禁止
+  }
+  ...
+  submitted = true;
+};
+
+
+// Good
+var submit_form = (function () {
+  var submitted = false;
+
+  return function (form_name) {
+    if (submitted) {
+      return; // 二重投稿禁止
+    }
+    ...
+    submitted = true;
+  }
+}());
+```
+:::note warn
+**自分用メモ** クロージャーについて調べる。なぜクロージャーにしないとダメなのか。以下ではダメか。
+
+```
+var submit_form = function () {
+  var submitted = false;
+  if (submitted) {
+    return; // 二重投稿禁止
+  }
+  ...
+  submitted = true;
+};
+
+```
+
+:::
