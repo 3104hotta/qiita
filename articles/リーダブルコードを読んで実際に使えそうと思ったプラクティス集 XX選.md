@@ -276,7 +276,6 @@ var submit_form = (function () {
 ```
 :::note warn
 **自分用メモ** クロージャーについて調べる。なぜクロージャーにしないとダメなのか。以下ではダメか。
-
 ```
 var submit_form = function () {
   var submitted = false;
@@ -288,5 +287,4 @@ var submit_form = function () {
 };
 
 ```
-
 :::
